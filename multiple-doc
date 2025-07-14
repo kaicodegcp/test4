@@ -1,0 +1,41 @@
+#!/bin/bash
+
+# Login to Citi Docker Artifact Registry
+docker login docker-cto-dev-local.artifactrepository.citigroup.net -u sk60554
+
+# Constants
+IMAGE_DIR="/docker/1.5.5/images"
+TARGET_TAG="1.5.5"
+TARGET_REGISTRY="docker-cto-dev-local.artifactrepository.citigroup.net/cti-eapbigdata-165345/cdp-private"
+
+echo "=== Step 1: Loading, Tagging, and Pushing All Docker Images ==="
+cd "$IMAGE_DIR" || { echo "Image directory not found!"; exit 1; }
+
+for TAR_FILE in *.tar.gz; do
+  echo ">> Processing $TAR_FILE"
+  
+  # Load and capture the image name
+  IMAGE_ID=$(docker load -i "$TAR_FILE" | tee /dev/stderr | grep -oP '(?<=Loaded image: ).*')
+  if [[ -z "$IMAGE_ID" ]]; then
+    echo "❌ Failed to load image from $TAR_FILE"
+    continue
+  fi
+
+  echo "Loaded image: $IMAGE_ID"
+
+  # Extract base image name
+  BASE_NAME=$(echo "$IMAGE_ID" | sed 's|.*/||' | cut -d':' -f1)
+  TARGET_IMAGE="${TARGET_REGISTRY}/${BASE_NAME}:${TARGET_TAG}"
+
+  # Tag and push
+  echo "Tagging as: $TARGET_IMAGE"
+  docker tag "$IMAGE_ID" "$TARGET_IMAGE"
+
+  echo "Pushing $TARGET_IMAGE ..."
+  docker push "$TARGET_IMAGE"
+
+  echo "✅ Pushed: $TARGET_IMAGE"
+  echo "------------------------------------------"
+done
+
+echo "🎉 All images processed."
