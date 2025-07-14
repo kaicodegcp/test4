@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Login to Citi Docker Artifact Registry
-docker login docker-cto-dev-local.artifactrepository.citigroup.net -u sk60554
+docker login docker-cto-dev-local.artifactrepository.net -u sk
 
 # Step 1: Load image
 echo "=== Step 1: Loading Docker Image ==="
@@ -20,7 +20,7 @@ BASE_NAME=$(echo "$IMAGE_ID" | sed 's|.*/||' | cut -d':' -f1)
 
 # Tag with version 1.5.5
 TARGET_TAG="1.5.5"
-TARGET_REGISTRY="docker-cto-dev-local.artifactrepository.citigroup.net/cti-eapbigdata-165345/cdp-private"
+TARGET_REGISTRY="docker-cto-dev-local.artifactrepository.net/cti-eapbigdata-165345/cdp-private"
 
 TARGET_IMAGE="${TARGET_REGISTRY}/${BASE_NAME}:${TARGET_TAG}"
 
