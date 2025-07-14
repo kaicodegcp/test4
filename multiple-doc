@@ -1,12 +1,12 @@
 #!/bin/bash
 
 # Login to Citi Docker Artifact Registry
-docker login docker-cto-dev-local.artifactrepository.citigroup.net -u sk60554
+docker login docker-cto-dev-local.artifactrepository.net -u sk60554
 
 # Constants
 IMAGE_DIR="/docker/1.5.5/images"
 TARGET_TAG="1.5.5"
-TARGET_REGISTRY="docker-cto-dev-local.artifactrepository.citigroup.net/cti-eapbigdata-165345/cdp-private"
+TARGET_REGISTRY="docker-cto-dev-local.artifactrepository.net/cti-eapbigdata-165345/cdp-private"
 
 echo "=== Step 1: Loading, Tagging, and Pushing All Docker Images ==="
 cd "$IMAGE_DIR" || { echo "Image directory not found!"; exit 1; }
