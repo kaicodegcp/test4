@@ -1,0 +1,33 @@
+#!/bin/bash
+
+# Login to Citi Docker Artifact Registry
+docker login docker-cto-dev-local.artifactrepository.citigroup.net -u sk60554
+
+# Step 1: Load image
+echo "=== Step 1: Loading Docker Image ==="
+cd /docker/1.5.5/images || { echo "Image directory not found!"; exit 1; }
+
+TAR_FILE="dex-diagnostics-1.24.0-b711.tar.gz"
+docker load -i "$TAR_FILE"
+
+# Step 2: Tag and Push
+# Extract loaded image name from docker load output
+IMAGE_ID=$(docker load -i "$TAR_FILE" | grep -oP '(?<=Loaded image: ).*')
+echo "Loaded image: $IMAGE_ID"
+
+# Extract base image name (last part of repo path)
+BASE_NAME=$(echo "$IMAGE_ID" | sed 's|.*/||' | cut -d':' -f1)
+
+# Tag with version 1.5.5
+TARGET_TAG="1.5.5"
+TARGET_REGISTRY="docker-cto-dev-local.artifactrepository.citigroup.net/cti-eapbigdata-165345/cdp-private"
+
+TARGET_IMAGE="${TARGET_REGISTRY}/${BASE_NAME}:${TARGET_TAG}"
+
+echo "Tagging image as: $TARGET_IMAGE"
+docker tag "$IMAGE_ID" "$TARGET_IMAGE"
+
+echo "Pushing $TARGET_IMAGE ..."
+docker push "$TARGET_IMAGE"
+
+echo "✅ Image pushed successfully: $TARGET_IMAGE"
